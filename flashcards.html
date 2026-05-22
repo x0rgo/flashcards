@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — Clima & Energía</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0f11;
+    --surface: #16181c;
+    --card-front: #1c1f26;
+    --card-back: #111820;
+    --accent: #4af0b0;
+    --accent2: #f0a34a;
+    --text: #e8e6e1;
+    --muted: #6b7280;
+    --border: rgba(255,255,255,0.07);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 80px;
+    overflow-x: hidden;
+  }
+
+  /* Subtle noise texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .stats {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* Instructions panel */
+  .instructions {
+    width: 100%;
+    max-width: 560px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .instructions-title {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 14px;
+  }
+
+  .instructions-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .instructions-list li {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .instructions-list li .step-num {
+    color: var(--accent);
+    font-weight: 500;
+    flex-shrink: 0;
+    width: 16px;
+  }
+
+  .instructions-list li strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .stats span {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    width: 100%;
+    max-width: 560px;
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 20px 0 36px;
+    position: relative;
+    z-index: 1;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* Card scene */
+  .scene {
+    width: 100%;
+    max-width: 560px;
+    height: 300px;
+    perspective: 1200px;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 36px 40px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+
+  .card-front {
+    background: var(--card-front);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+
+  .card-back {
+    background: var(--card-back);
+    transform: rotateY(180deg);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(74,240,176,0.08);
+    border-color: rgba(74,240,176,0.15);
+  }
+
+  .card-tag {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding: 4px 12px;
+    border-radius: 100px;
+  }
+
+  .card-front .card-tag {
+    background: rgba(240,163,74,0.12);
+    color: var(--accent2);
+    border: 1px solid rgba(240,163,74,0.2);
+  }
+
+  .card-back .card-tag {
+    background: rgba(74,240,176,0.1);
+    color: var(--accent);
+    border: 1px solid rgba(74,240,176,0.2);
+  }
+
+  .card-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.05rem, 2.5vw, 1.35rem);
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .card-back .card-text {
+    font-style: italic;
+    color: #c8f5e8;
+  }
+
+  .flip-hint {
+    margin-top: 18px;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    opacity: 0.7;
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  button {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    padding: 12px 22px;
+  }
+
+  .btn-nav {
+    background: var(--surface);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .btn-nav:hover:not(:disabled) {
+    background: #22262e;
+    color: var(--text);
+    border-color: rgba(255,255,255,0.15);
+  }
+  .btn-nav:disabled { opacity: 0.3; cursor: default; }
+
+  .btn-flip {
+    background: var(--accent);
+    color: #0a1a12;
+    font-weight: 500;
+    padding: 12px 30px;
+  }
+  .btn-flip:hover { background: #6df5bf; transform: translateY(-1px); }
+  .btn-flip:active { transform: translateY(0); }
+
+  .btn-shuffle {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    font-size: 11px;
+  }
+  .btn-shuffle:hover { color: var(--accent2); border-color: rgba(240,163,74,0.3); }
+
+  .counter {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    min-width: 60px;
+    text-align: center;
+  }
+  .counter span { color: var(--text); }
+
+  /* Keyboard hint */
+  .kbd-hints {
+    margin-top: 28px;
+    display: flex;
+    gap: 20px;
+    position: relative;
+    z-index: 1;
+  }
+  .kbd-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+  kbd {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text);
+  }
+
+  /* Entry animation */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  header  { animation: fadeUp 0.5s ease both; }
+  .progress-wrap { animation: fadeUp 0.5s 0.1s ease both; }
+  .scene  { animation: fadeUp 0.5s 0.15s ease both; }
+  .controls { animation: fadeUp 0.5s 0.2s ease both; }
+  .kbd-hints { animation: fadeUp 0.5s 0.25s ease both; }
+
+  @media (max-width: 480px) {
+    .scene { height: 260px; }
+    .card-face { padding: 28px 24px; }
+    .kbd-hints { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="stats">
+    Tarjeta <span id="stat-current">1</span> de <span id="stat-total">50</span>
+  </div>
+</header>
+
+<div class="instructions">
+  <div class="instructions-title">Cómo estudiar bien</div>
+  <ul class="instructions-list">
+    <li><span class="step-num">1.</span><span><strong>Lee la pregunta en voz alta.</strong> No la mires solo con los ojos — decirla activa mejor la memoria.</span></li>
+    <li><span class="step-num">2.</span><span><strong>Intenta responder antes de voltear.</strong> Aunque no estés seguro/a, el esfuerzo de recordar es lo que consolida el aprendizaje.</span></li>
+    <li><span class="step-num">3.</span><span><strong>Sé honesto/a al evaluar tu respuesta.</strong> Si solo recordaste parte, cuéntala como incorrecta y repásala luego.</span></li>
+    <li><span class="step-num">4.</span><span><strong>Mezcla las tarjetas en cada ronda.</strong> Estudiar siempre en el mismo orden crea una falsa sensación de dominio.</span></li>
+    <li><span class="step-num">5.</span><span><strong>Haz al menos 3 pasadas completas.</strong> La primera ronda es reconocimiento; la tercera es memorización real.</span></li>
+    <li><span class="step-num">6.</span><span><strong>Toma descansos cortos.</strong> 20–30 min de estudio + 5 min de pausa es más efectivo que estudiar una hora seguida.</span></li>
+  </ul>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar" id="progress-bar"></div>
+</div>
+
+<div class="scene" id="scene" onclick="flipCard()">
+  <div class="card" id="card">
+    <div class="card-face card-front">
+      <div class="card-tag">Pregunta</div>
+      <div class="card-text" id="question-text"></div>
+      <div class="flip-hint">clic para revelar</div>
+    </div>
+    <div class="card-face card-back">
+      <div class="card-tag">Respuesta</div>
+      <div class="card-text" id="answer-text"></div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="btn-nav" id="btn-prev" onclick="navigate(-1)">← Anterior</button>
+  <div class="counter"><span id="ctrl-current">1</span> / <span id="ctrl-total">50</span></div>
+  <button class="btn-nav" id="btn-next" onclick="navigate(1)">Siguiente →</button>
+</div>
+
+<div class="controls" style="margin-top:12px;">
+  <button class="btn-flip" onclick="flipCard()">Voltear tarjeta</button>
+  <button class="btn-shuffle" onclick="shuffleCards()">⇄ Mezclar</button>
+</div>
+
+<div class="kbd-hints">
+  <div class="kbd-hint"><kbd>←</kbd><kbd>→</kbd> navegar</div>
+  <div class="kbd-hint"><kbd>Space</kbd> voltear</div>
+  <div class="kbd-hint"><kbd>S</kbd> mezclar</div>
+</div>
+
+<script>
+const data = [
+  ["¿Dónde se realizó el Protocolo de Kioto?", "En Japón."],
+  ["¿Cuándo entró en vigor el Protocolo de Kioto?", "En 2005."],
+  ["¿Qué es el PBI?", "Producto Bruto Interno."],
+  ["Nombra una energía renovable.", "Energía hidráulica o solar."],
+  ["¿En qué año se reemplazó el Protocolo de Kioto por el Acuerdo de París?", "En 2015."],
+  ["¿Cuándo entró en vigor la reunión de Río de Janeiro?", "En 1994."],
+  ["¿Por qué los autos a gas son más baratos?", "Porque el gas es más fácil de extraer que el petróleo."],
+  ["¿En qué siglo el petróleo pasó a ocupar el lugar principal como fuente de energía?", "Siglo XIX (19)."],
+  ["¿En qué año los estados se suscribieron para reducir las emisiones de gases no controlados?", "En los años 2000."],
+  ["¿Qué pasa con la atmósfera y el calentamiento global?", "La atmósfera retiene el calor y altera el equilibrio natural del planeta."],
+  ["¿Cuándo inició la Revolución Industrial?", "Siglo XVIII (18)."],
+  ["¿Por qué el calentamiento global impacta sobre el nivel del mar?", "Porque las altas temperaturas expanden el agua y derriten el hielo."],
+  ["¿Qué porcentaje del PIB aporta Punta Cana?", "13%."],
+  ["¿Por qué se llama Protocolo de Kioto?", "Porque se firmó en Kioto, Japón."],
+  ["Menciona un efecto del calentamiento global.", "Cambios en el nivel del mar o alteración del régimen de hielo y deshielo."],
+  ["¿Qué consecuencias trae el cambio en el nivel del mar?", "El agua se expande y aumenta el volumen por el derretimiento del hielo."],
+  ["¿Cuál es la consecuencia del modelo de desarrollo económico?", "Un alto costo ambiental debido al elevado consumo de energía."],
+  ["¿Qué máquina trajo importantes cambios a la producción de bienes?", "La máquina de vapor."],
+  ["¿Qué significa GEI?", "Gases de efecto invernadero."],
+  ["¿Qué busca el Acuerdo de París?", "Mantener la temperatura global por debajo de 2 °C."],
+  ["¿Qué requiere el modelo de desarrollo económico?", "Inmensas cantidades de energía."],
+  ["¿Cuál es la diferencia entre el efecto invernadero y el calentamiento global?", "El efecto invernadero retiene energía solar en la atmósfera; el calentamiento global aumenta excesivamente esa retención de calor."],
+  ["¿Qué ocurrió paralelamente al aumento de la explotación de recursos?", "Se impulsó el crecimiento económico."],
+  ["¿Con qué comenzó la actividad industrial?", "Con el uso del carbón."],
+  ["¿Entre qué fechas se realizó la Conferencia de Naciones Unidas sobre Medio Ambiente y Desarrollo?", "Entre el 3 y el 14 de junio de 1992."],
+  ["¿A qué altura se ubica la estratopausa?", "A 50 km de altura."],
+  ["¿Con qué se complementó la producción masiva de bienes?", "Con la expansión de los mercados internos y el aumento de la capacidad de compra de la población."],
+  ["¿Por qué el aumento del nivel del mar afecta tanto a República Dominicana?", "Porque el país posee muchas zonas bajas y costeras."],
+  ["¿Qué acuerdo reemplazó al Protocolo de Kioto?", "El Acuerdo de París."],
+  ["¿Cuál fue la primera gran causa del cambio climático?", "La utilización de la máquina de vapor."],
+  ["¿En qué año se hizo la primera Conferencia de las Naciones Unidas sobre el Medio Humano?", "En 1972."],
+  ["¿Dónde se realizó la Cumbre de la Tierra?", "En Río de Janeiro."],
+  ["¿En qué año Brasil celebró la Conferencia de Naciones Unidas sobre el Medio Ambiente?", "En 1992."],
+  ["¿Qué es la evapotranspiración?", "Proceso por el cual los suelos se secan más rápido y las plantas tienen menos agua para absorber."],
+  ["¿Qué causa la evapotranspiración en República Dominicana?", "El calentamiento global."],
+  ["¿Qué es el cambio climático?", "Cambios en la temperatura media y concentración de vapor en la atmósfera."],
+  ["¿A dónde se están desplazando las especies debido al calentamiento global?", "A zonas más frescas."],
+  ["¿A qué animales deja sin comida la destrucción de arrecifes de coral?", "A cangrejos, peces y erizos de mar."],
+  ["¿Cuántos países fueron suscritos en la Cumbre de la Tierra?", "150 países."],
+  ["¿Cuáles son los efectos negativos de la industrialización?", "El aumento de dióxido de carbono y otros gases de efecto invernadero."],
+  ["¿Qué pasa con la energía solar que no es absorbida por la atmósfera?", "Rebota al espacio."],
+  ["¿Cuándo se vio una modificación radical en los patrones de producción y consumo?", "A finales del siglo XVIII."],
+  ["¿Qué provoca una de las modificaciones causadas por la actividad humana?", "La composición de gases de la atmósfera."],
+  ["¿En qué año terminó el Protocolo de Kioto?", "En 1997."],
+  ["¿Cómo se llama el protocolo encargado del cambio climático creado en 1992?", "El Protocolo de Kioto."],
+  ["¿En qué siglo aumentó la explotación de recursos naturales?", "Siglo XX (20)."],
+  ["¿Qué materia prima revolucionó la producción de energía en la actividad industrial?", "El carbón."],
+  ["¿Por qué los carros eléctricos son menos comunes en América Latina?", "Por falta de tecnología y accesibilidad a sus requerimientos."],
+  ["Explica cómo el calentamiento global impacta el nivel del mar.", "El aumento de la temperatura expande el agua y el derretimiento del hielo aporta más volumen."],
+  ["Menciona uno de los 10 países con más estrés climático del mundo.", "República Dominicana."],
+];
+
+let cards = [...data];
+let index = 0;
+let isFlipped = false;
+
+function render() {
+  document.getElementById('question-text').textContent = cards[index][0];
+  document.getElementById('answer-text').textContent = cards[index][1];
+  document.getElementById('stat-current').textContent = index + 1;
+  document.getElementById('stat-total').textContent = cards.length;
+  document.getElementById('ctrl-current').textContent = index + 1;
+  document.getElementById('ctrl-total').textContent = cards.length;
+  document.getElementById('btn-prev').disabled = index === 0;
+  document.getElementById('btn-next').disabled = index === cards.length - 1;
+  document.getElementById('progress-bar').style.width = ((index + 1) / cards.length * 100) + '%';
+  // Reset flip
+  isFlipped = false;
+  document.getElementById('card').classList.remove('flipped');
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('card').classList.toggle('flipped', isFlipped);
+}
+
+function navigate(dir) {
+  const next = index + dir;
+  if (next < 0 || next >= cards.length) return;
+  index = next;
+  render();
+}
+
+function shuffleCards() {
+  for (let i = cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+  }
+  index = 0;
+  render();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') navigate(1);
+  else if (e.key === 'ArrowLeft') navigate(-1);
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+  else if (e.key === 's' || e.key === 'S') shuffleCards();
+});
+
+render();
+</script>
+</body>
+</html>
