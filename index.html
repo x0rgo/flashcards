@@ -164,6 +164,11 @@
       <input type="number" id="examPts" min="0" max="55" step="0.5" placeholder="0–55">
       <span style="font-size:12px;color:#9c9480">/ 55</span>
     </div>
+    <div class="toggle-wrap">
+      <span class="toggle-label" id="lblA">Reparto 50/50</span>
+      <button id="splitToggle" class="switch" role="switch" aria-checked="false"><span class="knob"></span></button>
+      <span class="toggle-label dim" id="lblB">Todo a una categoría</span>
+    </div>
     <div class="exam-note" id="examNote">Necesitas al menos <b>29 / 55</b> (53%) para aprobar con 70%.</div>
   </div>
 
@@ -173,21 +178,25 @@
   </div>
 
   <footer>
-    Las celdas Examen y Practica se llenan solas con los puntos del examen.<br>
-    Puedes editar cualquier categoría manualmente. Pesos suman 100.
+    Examen y Practica se calculan solos con los puntos del examen (no aparecen como filas).<br>
+    Puedes editar las demás categorías manualmente. Pesos suman 100.
   </footer>
 </div>
 
 <script>
-  // Categories: [name, weight, default score %]
+  // Visible category rows
   const cats = [
-    {key:'examen',   name:'Examen',        weight:30, score:0},
     {key:'quiz',     name:'Quiz',          weight:10, score:91.3},
     {key:'behavior', name:'Behavior',      weight:10, score:100},
     {key:'part',     name:'Participación', weight:5,  score:120},
-    {key:'practica', name:'Practica',      weight:25, score:0},
     {key:'tareas',   name:'Tareas',        weight:10, score:67},
     {key:'cuaderno', name:'Cuaderno',      weight:10, score:90},
+  ];
+
+  // Hidden categories fed only by the exam-points box (not shown as rows)
+  const hidden = [
+    {key:'examen',   weight:30, value:0},
+    {key:'practica', weight:25, value:0},
   ];
 
   const rowsEl = document.getElementById('rows');
@@ -203,24 +212,48 @@
     row.querySelector('input').addEventListener('input', recalc);
   });
 
+  let allInOne = false; // false = 50/50, true = fill one category first
+
   const examPtsEl = document.getElementById('examPts');
+  const toggle = document.getElementById('splitToggle');
+  const lblA = document.getElementById('lblA');
+  const lblB = document.getElementById('lblB');
+
+  function getHidden(key){ return hidden.find(h=>h.key===key); }
 
   function distribute(){
     const pts = parseFloat(examPtsEl.value);
     if(isNaN(pts)){
-      document.getElementById('in-examen').value = '';
-      document.getElementById('in-practica').value = '';
+      getHidden('examen').value = 0;
+      getHidden('practica').value = 0;
       recalc(); return;
     }
-    // All-in-one: fill Examen first (up to 30 pts), leftover into Practica
-    const examenPts = Math.min(pts, 30);
-    const practicaPts = Math.max(pts - 30, 0);
-    document.getElementById('in-examen').value   = +((examenPts/30)*100).toFixed(1);
-    document.getElementById('in-practica').value = +((practicaPts/25)*100).toFixed(1);
+    if(allInOne){
+      // Fill Examen first (up to its 30-pt share), leftover into Practica
+      const examenPts = Math.min(pts, 30);
+      const practicaPts = Math.max(pts - 30, 0);
+      getHidden('examen').value   = (examenPts/30)*100;
+      getHidden('practica').value = (practicaPts/25)*100;
+    } else {
+      // 50/50: same fraction in both
+      const frac = (pts/55)*100;
+      getHidden('examen').value   = frac;
+      getHidden('practica').value = frac;
+    }
     recalc();
   }
 
   examPtsEl.addEventListener('input', distribute);
+
+  if(toggle){
+    toggle.addEventListener('click', ()=>{
+      allInOne = !allInOne;
+      toggle.setAttribute('aria-checked', allInOne ? 'true' : 'false');
+      lblA.classList.toggle('dim', allInOne);
+      lblB.classList.toggle('dim', !allInOne);
+      distribute();
+    });
+  }
 
   function recalc(){
     let totalW = 0, weighted = 0;
@@ -228,6 +261,10 @@
       const v = parseFloat(document.getElementById('in-'+c.key).value) || 0;
       weighted += (v/100)*c.weight;
       totalW += c.weight;
+    });
+    hidden.forEach(h=>{
+      weighted += (h.value/100)*h.weight;
+      totalW += h.weight;
     });
     const final = (weighted/totalW)*100;
     const g = document.getElementById('grade');
