@@ -12,10 +12,8 @@
     --ink:#f5f3ee;
     --paper:#0b0b0c;
     --line:#33312c;
-    --dot:#1a1a1c;
     --accent:#fb923c;
     --accent2:#4ade80;
-    --warn:#fbbf24;
     --card-bg:#161618;
     --card-back:#0f1a0f;
   }
@@ -27,14 +25,29 @@
     min-height:100vh;
     padding:32px 16px 64px;
   }
-  .wrap{max-width:680px;margin:0 auto}
+  .wrap{max-width:640px;margin:0 auto}
 
-  header{margin-bottom:28px;border-bottom:3px solid var(--ink);padding-bottom:16px}
+  /* Header */
+  header{margin-bottom:24px;border-bottom:3px solid var(--ink);padding-bottom:16px}
   h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(28px,7vw,44px);line-height:0.95;letter-spacing:-0.02em}
   .sub{font-size:12px;margin-top:8px;color:#9c9480;letter-spacing:0.05em}
 
-  /* Filter tabs */
-  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+  /* Instructions */
+  .howto{border:2px solid var(--line);background:#161618;padding:16px 18px;margin-bottom:24px}
+  .howto-header{
+    display:flex;justify-content:space-between;align-items:center;
+    cursor:pointer;
+  }
+  .howto-header h3{font-family:'Fraunces',serif;font-size:15px}
+  .howto-toggle{font-size:11px;color:#9c9480;letter-spacing:0.05em;user-select:none}
+  .howto-body{margin-top:12px}
+  .howto-body ol{padding-left:18px}
+  .howto-body li{font-size:12px;line-height:1.7;color:#d8d3c6;margin-bottom:4px}
+  .howto-body li b{color:var(--accent)}
+  .howto-body.hidden{display:none}
+
+  /* Filters */
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
   .filter-btn{
     font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
     text-transform:uppercase;letter-spacing:0.1em;
@@ -45,83 +58,71 @@
   .filter-btn:hover{border-color:var(--ink);color:var(--ink)}
   .filter-btn.active{border-color:var(--accent);color:var(--accent);background:#1a100a}
 
-  /* Progress bar */
+  /* Progress */
   .progress-wrap{margin-bottom:20px}
   .progress-meta{display:flex;justify-content:space-between;font-size:11px;color:#9c9480;margin-bottom:6px}
-  .progress-meta span b{color:var(--ink)}
-  .bar{height:10px;background:var(--line);border:2px solid var(--ink);position:relative;overflow:hidden}
+  .progress-meta b{color:var(--ink)}
+  .bar{height:10px;background:var(--line);border:2px solid var(--ink);overflow:hidden}
   .bar-fill{height:100%;background:var(--accent2);width:0;transition:width 0.35s ease}
 
-  /* Card scene */
+  /* Card */
   .scene{
-    perspective:1200px;
-    width:100%;
-    margin-bottom:24px;
-    cursor:pointer;
-    user-select:none;
+    perspective:1200px;width:100%;
+    margin-bottom:20px;cursor:pointer;user-select:none;
   }
   .card{
-    width:100%;min-height:260px;
-    position:relative;
+    width:100%;min-height:240px;position:relative;
     transform-style:preserve-3d;
     transition:transform 0.5s cubic-bezier(.4,0,.2,1);
   }
   .card.flipped{transform:rotateY(180deg)}
   .face{
     position:absolute;top:0;left:0;right:0;
-    backface-visibility:hidden;
-    -webkit-backface-visibility:hidden;
-    border:3px solid var(--ink);
-    padding:32px 28px;
+    backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    border:3px solid var(--ink);padding:28px 24px;
     display:flex;flex-direction:column;justify-content:center;
-    min-height:260px;
-    box-shadow:6px 6px 0 var(--ink);
+    min-height:240px;box-shadow:6px 6px 0 var(--ink);
   }
   .face.front{background:var(--card-bg)}
-  .face.back{
-    background:var(--card-back);
-    transform:rotateY(180deg);
-    border-color:var(--accent2);
-    box-shadow:6px 6px 0 var(--accent2);
-  }
-  .face-label{
-    font-size:10px;text-transform:uppercase;letter-spacing:0.15em;
-    color:#9c9480;margin-bottom:14px;
-  }
+  .face.back{background:var(--card-back);transform:rotateY(180deg);border-color:var(--accent2);box-shadow:6px 6px 0 var(--accent2)}
+  .face-label{font-size:10px;text-transform:uppercase;letter-spacing:0.15em;color:#9c9480;margin-bottom:12px}
   .face.back .face-label{color:var(--accent2)}
-  .face-text{
-    font-family:'Fraunces',serif;font-weight:600;
-    font-size:clamp(16px,3.5vw,22px);line-height:1.4;
-  }
-  .face.back .face-text{font-weight:400;font-size:clamp(15px,3vw,20px)}
-  .flip-hint{
-    font-size:10px;color:#5a564d;margin-top:20px;letter-spacing:0.08em;
-  }
-  .face.back .flip-hint{color:#2d4a2d}
+  .face-text{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(16px,3.5vw,21px);line-height:1.4}
+  .face.back .face-text{font-weight:400}
+  .face-hint{font-size:10px;color:#5a564d;margin-top:16px}
+  .face.back .face-hint{color:#2d4a2d}
+  .face-badge{font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:10px}
 
-  /* Navigation */
-  .nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+  /* Nav row */
+  .nav{display:flex;align-items:center;gap:8px;margin-bottom:12px}
   .nav-btn{
     font-family:'Space Mono',monospace;font-size:13px;font-weight:700;
-    padding:10px 20px;border:2px solid var(--ink);
+    padding:10px 18px;border:2px solid var(--ink);
     background:transparent;color:var(--ink);cursor:pointer;border-radius:2px;
     transition:all 0.15s;flex:0 0 auto;
   }
   .nav-btn:hover:not(:disabled){background:var(--ink);color:var(--paper)}
   .nav-btn:disabled{opacity:0.25;cursor:not-allowed}
-  .card-counter{
-    font-family:'Fraunces',serif;font-weight:900;
-    font-size:clamp(20px,5vw,32px);letter-spacing:-0.02em;
-    text-align:center;flex:1;
+  .counter{
+    font-family:'Fraunces',serif;font-weight:900;font-size:clamp(18px,5vw,28px);
+    letter-spacing:-0.02em;text-align:center;flex:1;
   }
-  .card-counter span{color:#9c9480;font-size:0.6em;font-family:'Space Mono',monospace;font-weight:400}
+  .counter span{color:#9c9480;font-size:0.55em;font-family:'Space Mono',monospace;font-weight:400}
+  .icon-btn{
+    font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
+    padding:10px 14px;border:2px solid var(--line);
+    background:transparent;color:#9c9480;cursor:pointer;border-radius:2px;
+    transition:all 0.15s;flex:0 0 auto;
+    text-transform:uppercase;letter-spacing:0.08em;
+  }
+  .icon-btn:hover{border-color:var(--accent);color:var(--accent)}
 
   /* Mark buttons */
-  .mark-row{display:flex;gap:10px;margin-bottom:28px}
+  .mark-row{display:flex;gap:10px;margin-bottom:24px}
   .mark-btn{
     flex:1;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
     text-transform:uppercase;letter-spacing:0.1em;
-    padding:10px;border:2px solid var(--line);
+    padding:11px;border:2px solid var(--line);
     background:transparent;color:#9c9480;cursor:pointer;border-radius:2px;
     transition:all 0.15s;
   }
@@ -129,99 +130,50 @@
   .mark-btn.got-it{border-color:var(--accent2);color:var(--accent2);background:#0f1a0f}
   .mark-btn.review{border-color:#f87171;color:#f87171;background:#1a0d0d}
 
-  /* Stats */
-  .stats{
-    border:2px solid var(--line);background:#161618;
-    padding:16px 18px;margin-bottom:24px;
-    display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
-  }
-  .stat-item{text-align:center}
-  .stat-num{font-family:'Fraunces',serif;font-weight:900;font-size:28px;line-height:1}
-  .stat-label{font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:#9c9480;margin-top:4px}
-  .stat-num.green{color:var(--accent2)}
-  .stat-num.red{color:#f87171}
-  .stat-num.orange{color:var(--accent)}
-
-  /* Keyboard hint */
-  .kbd-hint{
-    font-size:10px;color:#5a564d;text-align:center;margin-bottom:24px;line-height:1.8;
-  }
-  .kbd-hint kbd{
-    display:inline-block;padding:1px 6px;border:1px solid #33312c;
-    border-radius:2px;font-family:'Space Mono',monospace;font-size:9px;
-  }
-
-  /* Shuffle button */
-  .actions{display:flex;gap:10px;margin-bottom:8px}
-  .action-btn{
-    font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
-    text-transform:uppercase;letter-spacing:0.1em;
-    padding:8px 16px;border:2px solid var(--line);
-    background:transparent;color:#9c9480;cursor:pointer;border-radius:2px;
-    transition:all 0.15s;
-  }
-  .action-btn:hover{border-color:var(--accent);color:var(--accent)}
-
-  footer{margin-top:32px;font-size:10px;color:#6b6451;text-align:center;line-height:1.6}
-
-  /* Empty state */
-  .empty{
-    border:2px dashed var(--line);padding:40px;text-align:center;
-    color:#5a564d;font-size:13px;
-  }
-
-  /* Topic badge */
-  .topic-badge{
-    display:inline-block;font-size:9px;text-transform:uppercase;letter-spacing:0.12em;
-    padding:3px 8px;border-radius:2px;margin-bottom:12px;
-    background:#1a140d;color:var(--accent);border:1px solid var(--accent);
-  }
+  .empty{border:2px dashed var(--line);padding:40px;text-align:center;color:#5a564d;font-size:13px}
 </style>
 </head>
 <body>
 <div class="wrap">
+
   <header>
     <h1>Flash<br>Cards</h1>
     <div class="sub">Historia · 4to de Secundaria · 50 preguntas</div>
   </header>
 
+  <!-- Instructions -->
+  <div class="howto">
+    <div class="howto-header" id="howtoHeader">
+      <h3>Cómo usar</h3>
+      <span class="howto-toggle" id="howtoToggle">▾ mostrar</span>
+    </div>
+    <div class="howto-body hidden" id="howtoBody">
+      <ol>
+        <li>Elige un <b>tema</b> con los botones de arriba, o deja "Todos" para ver todas las tarjetas.</li>
+        <li><b>Haz clic en la tarjeta</b> para voltearla y ver la respuesta.</li>
+        <li>Usa <b>← →</b> para pasar de tarjeta en tarjeta.</li>
+        <li>Marca cada tarjeta con <b>✓ Sé esto</b> o <b>✗ Repasar</b> para llevar tu progreso.</li>
+        <li>Usa <b>Mezclar</b> para practicar en orden aleatorio, o <b>Reiniciar</b> para borrar tu progreso.</li>
+        <li>Atajos de teclado: <b>Espacio</b> voltea · <b>1</b> Sé esto · <b>2</b> Repasar.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- Filters -->
   <div class="filters" id="filters"></div>
 
+  <!-- Progress bar -->
   <div class="progress-wrap">
     <div class="progress-meta">
-      <span>Aprendidas: <b id="learnedCount">0</b></span>
-      <span>Total: <b id="totalCount">0</b></span>
+      <span>Aprendidas: <b id="learnedCount">0</b> / <b id="totalCount">0</b></span>
+      <span id="pctLabel">0%</span>
     </div>
     <div class="bar"><div class="bar-fill" id="barfill"></div></div>
   </div>
 
-  <div class="stats">
-    <div class="stat-item">
-      <div class="stat-num orange" id="statTotal">0</div>
-      <div class="stat-label">Total</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num green" id="statGot">0</div>
-      <div class="stat-label">Sé esto</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num red" id="statReview">0</div>
-      <div class="stat-label">Repasar</div>
-    </div>
-  </div>
-
-  <div class="actions">
-    <button class="action-btn" id="shuffleBtn">⇄ Mezclar</button>
-    <button class="action-btn" id="resetBtn">↺ Reiniciar</button>
-  </div>
-
+  <!-- Card + nav -->
   <div id="cardArea"></div>
 
-  <div class="kbd-hint">
-    <kbd>←</kbd> Anterior &nbsp;·&nbsp; <kbd>→</kbd> Siguiente &nbsp;·&nbsp; <kbd>Space</kbd> Voltear &nbsp;·&nbsp; <kbd>1</kbd> Sé esto &nbsp;·&nbsp; <kbd>2</kbd> Repasar
-  </div>
-
-  <footer>Haz clic en la tarjeta para voltearla y ver la respuesta.<br>Usa los botones para marcar tu progreso.</footer>
 </div>
 
 <script>
@@ -237,8 +189,7 @@ const data = [
   {student:'Alan', topic:'Edad de los Metales', q:'¿Para qué se utilizaba principalmente el cobre?', a:'Para hacer adornos como brazaletes, anillos y collares'},
   {student:'Alan', topic:'Edad de los Metales', q:'Paralelamente al cobre, ¿qué más utilizaban los seres humanos?', a:'Piedras, huesos y madera'},
   {student:'Alan', topic:'Edad de los Metales', q:'¿Dónde se han encontrado los objetos de cobre fundido más antiguos?', a:'En Irán'},
-
-  // MARINA — Evolución
+  // MARINA — Evolución Humana
   {student:'Marina', topic:'Evolución Humana', q:'¿En qué año Darwin publicó "El origen de las especies"?', a:'1859'},
   {student:'Marina', topic:'Evolución Humana', q:'¿Qué idea propuso Darwin para entender cómo evolucionaron los seres vivos?', a:'Darwin propuso la idea de la selección natural'},
   {student:'Marina', topic:'Evolución Humana', q:'¿Hace cuánto comenzó el proceso evolutivo de los primates?', a:'Hace 6 millones de años'},
@@ -249,7 +200,6 @@ const data = [
   {student:'Marina', topic:'Evolución Humana', q:'¿Cuáles fueron los primeros homínidos en emplear el fuego?', a:'Los Homo erectus'},
   {student:'Marina', topic:'Evolución Humana', q:'¿Menciona dos características del Australopithecus Afarensis?', a:'Poseían manos largas y andaban erguidos'},
   {student:'Marina', topic:'Evolución Humana', q:'¿Menciona tres homínidos?', a:'Homo habilis, Homo erectus y Homo Sapiens Sapiens'},
-
   // KEVIN — Paleolítico
   {student:'Kevin', topic:'Paleolítico', q:'¿Cuándo apareció el Homo Habilis?', a:'Hace 2.5 millones de años'},
   {student:'Kevin', topic:'Paleolítico', q:'¿Cuándo inició el período Paleolítico?', a:'Hace 2.5 millones de años'},
@@ -261,7 +211,6 @@ const data = [
   {student:'Kevin', topic:'Paleolítico', q:'¿Hace cuánto fue descubierto el fuego?', a:'Hace 50,000 (cincuenta mil) años'},
   {student:'Kevin', topic:'Paleolítico', q:'¿Cuáles fueron las primeras formas de arte del Paleolítico?', a:'La escultura y la pintura'},
   {student:'Kevin', topic:'Paleolítico', q:'¿Durante qué período se elaboraron las primeras herramientas?', a:'Durante el Paleolítico'},
-
   // KAILY — Neolítico
   {student:'Kaily', topic:'Neolítico', q:'¿A partir de cuándo se ha elevado la temperatura de la Tierra de manera gradual?', a:'A partir del 10000 a.C.'},
   {student:'Kaily', topic:'Neolítico', q:'¿Qué animales emigraron hacia el norte en el Neolítico?', a:'Bisontes y renos'},
@@ -273,7 +222,6 @@ const data = [
   {student:'Kaily', topic:'Neolítico', q:'¿Qué fue el Çatal Hüyük?', a:'Es un asentamiento neolítico'},
   {student:'Kaily', topic:'Neolítico', q:'¿Por dónde se entraba a las viviendas del Neolítico?', a:'Por el techo'},
   {student:'Kaily', topic:'Neolítico', q:'¿De qué estaban construidos los muros de las casas en el Neolítico?', a:'De ladrillos de barro'},
-
   // ISABELLA — Historiografía
   {student:'Isabella', topic:'Historiografía', q:'¿A partir de qué siglo fue cambiando la concepción de solo documentar eventos privilegiados?', a:'A partir del siglo XX'},
   {student:'Isabella', topic:'Historiografía', q:'¿Qué es la historiografía?', a:'Es el registro escrito de la historia'},
@@ -288,13 +236,20 @@ const data = [
 ];
 
 const students = ['Todos', 'Alan', 'Marina', 'Kevin', 'Kaily', 'Isabella'];
-const marks = {}; // index → 'got' | 'review'
-let deck = [];
-let current = 0;
-let flipped = false;
-let activeFilter = 'Todos';
+const marks = {};
+let deck = [], current = 0, flipped = false, activeFilter = 'Todos';
 
-// Build filter buttons
+// Instructions toggle
+const howtoHeader = document.getElementById('howtoHeader');
+const howtoBody = document.getElementById('howtoBody');
+const howtoToggle = document.getElementById('howtoToggle');
+howtoHeader.addEventListener('click', () => {
+  const open = !howtoBody.classList.contains('hidden');
+  howtoBody.classList.toggle('hidden', open);
+  howtoToggle.textContent = open ? '▾ mostrar' : '▴ ocultar';
+});
+
+// Filter buttons
 const filtersEl = document.getElementById('filters');
 students.forEach(s => {
   const btn = document.createElement('button');
@@ -311,11 +266,9 @@ function setFilter(s) {
 }
 
 function buildDeck() {
-  deck = data
-    .map((card, i) => ({...card, origIdx: i}))
-    .filter(c => activeFilter === 'Todos' || c.student === activeFilter);
-  current = 0;
-  flipped = false;
+  deck = data.map((c, i) => ({...c, origIdx: i}))
+             .filter(c => activeFilter === 'Todos' || c.student === activeFilter);
+  current = 0; flipped = false;
   render();
 }
 
@@ -324,90 +277,67 @@ function shuffle(arr) {
     const j = Math.floor(Math.random() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
-  return arr;
 }
 
-document.getElementById('shuffleBtn').addEventListener('click', () => {
-  shuffle(deck);
-  current = 0;
-  flipped = false;
-  render();
-});
+function getMark(c) { return marks[c.origIdx] || null; }
 
-document.getElementById('resetBtn').addEventListener('click', () => {
-  deck.forEach(c => delete marks[c.origIdx]);
-  buildDeck();
-});
-
-function getMark(card) { return marks[card.origIdx] || null; }
-
-function setMark(card, val) {
-  if (marks[card.origIdx] === val) {
-    delete marks[card.origIdx];
-  } else {
-    marks[card.origIdx] = val;
-  }
-  updateStats();
+function setMark(c, val) {
+  if (marks[c.origIdx] === val) delete marks[c.origIdx];
+  else marks[c.origIdx] = val;
+  updateProgress();
   renderMarkButtons();
 }
 
-function updateStats() {
-  const inDeck = deck;
-  let got = 0, review = 0;
-  inDeck.forEach(c => {
-    if (marks[c.origIdx] === 'got') got++;
-    else if (marks[c.origIdx] === 'review') review++;
-  });
-  document.getElementById('statTotal').textContent = inDeck.length;
-  document.getElementById('statGot').textContent = got;
-  document.getElementById('statReview').textContent = review;
+function updateProgress() {
+  let got = 0;
+  deck.forEach(c => { if (marks[c.origIdx] === 'got') got++; });
+  const pct = deck.length ? Math.round((got / deck.length) * 100) : 0;
   document.getElementById('learnedCount').textContent = got;
-  document.getElementById('totalCount').textContent = inDeck.length;
-  const pct = inDeck.length ? (got / inDeck.length) * 100 : 0;
+  document.getElementById('totalCount').textContent = deck.length;
+  document.getElementById('pctLabel').textContent = pct + '%';
   document.getElementById('barfill').style.width = pct + '%';
 }
 
 function renderMarkButtons() {
-  const card = deck[current];
-  if (!card) return;
-  const mark = getMark(card);
-  document.getElementById('gotBtn').classList.toggle('got-it', mark === 'got');
-  document.getElementById('reviewBtn').classList.toggle('review', mark === 'review');
+  const c = deck[current];
+  if (!c) return;
+  const m = getMark(c);
+  document.getElementById('gotBtn').classList.toggle('got-it', m === 'got');
+  document.getElementById('reviewBtn').classList.toggle('review', m === 'review');
 }
 
 function render() {
   const area = document.getElementById('cardArea');
-
   if (!deck.length) {
     area.innerHTML = '<div class="empty">No hay tarjetas para este filtro.</div>';
-    updateStats();
+    updateProgress();
     return;
   }
-
-  const card = deck[current];
-
+  const c = deck[current];
   area.innerHTML = `
     <div class="scene" id="scene">
       <div class="card" id="card">
         <div class="face front">
-          <div class="topic-badge">${card.student} · ${card.topic}</div>
+          <div class="face-badge">${c.student} · ${c.topic}</div>
           <div class="face-label">Pregunta</div>
-          <div class="face-text">${card.q}</div>
-          <div class="flip-hint">Haz clic para ver la respuesta</div>
+          <div class="face-text">${c.q}</div>
+          <div class="face-hint">Toca para ver la respuesta</div>
         </div>
         <div class="face back">
-          <div class="topic-badge">${card.student} · ${card.topic}</div>
+          <div class="face-badge">${c.student} · ${c.topic}</div>
           <div class="face-label">Respuesta</div>
-          <div class="face-text">${card.a}</div>
-          <div class="flip-hint">Haz clic para ver la pregunta</div>
+          <div class="face-text">${c.a}</div>
+          <div class="face-hint">Toca para ver la pregunta</div>
         </div>
       </div>
     </div>
 
     <div class="nav">
-      <button class="nav-btn" id="prevBtn" ${current === 0 ? 'disabled' : ''}>← Ant</button>
-      <div class="card-counter">${current + 1} <span>/ ${deck.length}</span></div>
-      <button class="nav-btn" id="nextBtn" ${current === deck.length - 1 ? 'disabled' : ''}>Sig →</button>
+      <button class="nav-btn" id="prevBtn" ${current===0?'disabled':''}>←</button>
+      <div class="counter">${current+1} <span>/ ${deck.length}</span></div>
+      <button class="nav-btn" id="nextBtn" ${current===deck.length-1?'disabled':''}>→</button>
+      <button class="icon-btn" id="shuffleBtn">⇄</button>
+      <button class="icon-btn" id="resetBtn">↺</button>
     </div>
 
     <div class="mark-row">
@@ -421,25 +351,28 @@ function render() {
   document.getElementById('scene').addEventListener('click', toggleFlip);
   document.getElementById('prevBtn').addEventListener('click', e => { e.stopPropagation(); go(-1); });
   document.getElementById('nextBtn').addEventListener('click', e => { e.stopPropagation(); go(1); });
-  document.getElementById('gotBtn').addEventListener('click', e => { e.stopPropagation(); setMark(card, 'got'); });
-  document.getElementById('reviewBtn').addEventListener('click', e => { e.stopPropagation(); setMark(card, 'review'); });
+  document.getElementById('shuffleBtn').addEventListener('click', e => {
+    e.stopPropagation(); shuffle(deck); current=0; flipped=false; render();
+  });
+  document.getElementById('resetBtn').addEventListener('click', e => {
+    e.stopPropagation(); deck.forEach(c => delete marks[c.origIdx]); buildDeck();
+  });
+  document.getElementById('gotBtn').addEventListener('click', e => { e.stopPropagation(); setMark(c,'got'); });
+  document.getElementById('reviewBtn').addEventListener('click', e => { e.stopPropagation(); setMark(c,'review'); });
 
   renderMarkButtons();
-  updateStats();
+  updateProgress();
 }
 
 function toggleFlip() {
   flipped = !flipped;
-  const card = document.getElementById('card');
-  if (card) card.classList.toggle('flipped', flipped);
+  document.getElementById('card')?.classList.toggle('flipped', flipped);
 }
 
 function go(dir) {
-  const next = current + dir;
-  if (next < 0 || next >= deck.length) return;
-  current = next;
-  flipped = false;
-  render();
+  const n = current + dir;
+  if (n < 0 || n >= deck.length) return;
+  current = n; flipped = false; render();
 }
 
 document.addEventListener('keydown', e => {
@@ -447,8 +380,8 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') go(1);
   else if (e.key === 'ArrowLeft') go(-1);
   else if (e.key === ' ') { e.preventDefault(); toggleFlip(); }
-  else if (e.key === '1') { if (deck[current]) setMark(deck[current], 'got'); }
-  else if (e.key === '2') { if (deck[current]) setMark(deck[current], 'review'); }
+  else if (e.key === '1') { if (deck[current]) setMark(deck[current],'got'); }
+  else if (e.key === '2') { if (deck[current]) setMark(deck[current],'review'); }
 });
 
 buildDeck();
